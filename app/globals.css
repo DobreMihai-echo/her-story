@@ -1,26 +1,76 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+:root{
+  --bg: #fff6fb;
+  --text:#140a12;
+  --muted: rgba(20,10,18,.65);
+  --line: rgba(20,10,18,.12);
+  --pink:#ff2d8d;
+  --pink2:#ff5fb7;
+  --shadow: 0 18px 70px rgba(20,10,18,0.10);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+html, body { height: 100%; }
+
+body{
+  background:
+    radial-gradient(900px 500px at 15% 5%, rgba(255,45,141,.18), transparent 60%),
+    radial-gradient(800px 500px at 85% 10%, rgba(255,95,183,.12), transparent 65%),
+    linear-gradient(180deg, var(--bg) 0%, #ffffff 45%, var(--bg) 100%);
+  color: var(--text);
+  font-family: var(--font-body, ui-sans-serif, system-ui);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+::selection { background: rgba(255,45,141,.22); }
+
+a { color: var(--text); }
+a:hover { color: var(--pink); }
+
+.badge{
+  display:inline-flex;
+  align-items:center;
+  padding:.35rem .75rem;
+  border:1px solid rgba(255,45,141,.45);
+  border-radius:999px;
+  background: rgba(255,45,141,.08);
+  color: rgba(20,10,18,.85);
+  font-size:.75rem;
+  letter-spacing:.22em;
+  text-transform: uppercase;
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+.card{
+  background: rgba(255,255,255,.92);
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow);
+  border-radius: 22px;
+}
+
+.btn-pink{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  padding:.9rem 1.2rem;
+  border-radius:999px;
+  background: linear-gradient(90deg, var(--pink) 0%, var(--pink2) 60%, #ff85cf 100%);
+  color:#fff;
+  font-weight:700;
+  box-shadow: 0 18px 50px rgba(255,45,141,.25);
+  border: 1px solid rgba(255,255,255,.4);
+}
+
+.btn-ghost{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  padding:.9rem 1.2rem;
+  border-radius:999px;
+  border: 1px solid rgba(20,10,18,.16);
+  background: rgba(255,255,255,.70);
+  color: var(--text);
+}
+
+.pink-rule{
+  height: 2px;
+  background: linear-gradient(to right, transparent, rgba(255,45,141,.75), transparent);
 }

@@ -1,0 +1,68 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Prompt {
+  id         String  @id @default(uuid())
+  title      String  @unique
+  helperText String?
+  sortOrder  Int     @default(0)
+  isActive   Boolean @default(true)
+
+  memories   Memory[]
+}
+
+model Memory {
+  id           String   @id @default(uuid())
+  createdAt    DateTime @default(now())
+
+  authorName   String?
+  isAnonymous  Boolean  @default(false)
+  relationship String?
+  message      String
+
+  placeName    String?
+  placeLat     Float?
+  placeLng     Float?
+
+  isVisible    Boolean  @default(true)
+  isFeatured   Boolean  @default(false)
+
+  promptId     String?
+  prompt       Prompt?  @relation(fields: [promptId], references: [id])
+
+  media        MemoryMedia[]
+
+  @@index([createdAt])
+  @@index([isVisible])
+  @@index([isFeatured])
+}
+
+model MemoryMedia {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+
+  memoryId  String
+  memory    Memory   @relation(fields: [memoryId], references: [id], onDelete: Cascade)
+
+  mediaUrl  String
+  caption   String?
+
+  @@index([memoryId])
+}
+
+model ColumnEntry {
+  id          String   @id @default(uuid())
+  createdAt   DateTime @default(now())
+  title       String
+  body        String
+  isPublished Boolean  @default(true)
+
+  @@index([createdAt])
+  @@index([isPublished])
+}

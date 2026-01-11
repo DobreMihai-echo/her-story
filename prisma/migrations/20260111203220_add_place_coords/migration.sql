@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "Memory" ADD COLUMN     "placeLat" DOUBLE PRECISION,
+ADD COLUMN     "placeLng" DOUBLE PRECISION;
