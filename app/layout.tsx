@@ -1,3 +1,4 @@
+import "leaflet/dist/leaflet.css";
 import "./globals.css";
 import { Playfair_Display, Inter } from "next/font/google";
 
