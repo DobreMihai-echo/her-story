@@ -35,9 +35,8 @@ export default function CityMapClient() {
   useEffect(() => {
     let mounted = true;
     (async () => {
-      const L = await import("leaflet");
-      await import("leaflet/dist/leaflet.css");
-      const RL = await import("react-leaflet");
+const L = await import("leaflet");
+const RL = await import("react-leaflet");
 
       // Fix marker icons (CDN)
       const markerIcon = new L.Icon.default({
