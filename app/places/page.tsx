@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 export default async function PlacesPage() {
   const withPlaces = await prisma.memory.findMany({
     where: {
+      status: "approved",
       placeName: { not: null },
     },
     orderBy: { createdAt: "desc" },
