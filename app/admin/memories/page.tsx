@@ -30,7 +30,6 @@ export default async function AdminMemoriesPage() {
                 <th className="p-3 text-left">Author</th>
                 <th className="p-3 text-left">Message</th>
                 <th className="p-3 text-left">Place</th>
-                <th className="p-3 text-left">Status</th>
                 <th className="p-3 text-left">Featured</th>
                 <th className="p-3 text-left">Actions</th>
               </tr>
@@ -53,7 +52,6 @@ export default async function AdminMemoriesPage() {
                     </div>
                   </td>
                   <td className="p-3 text-neutral-300">{m.placeName ?? "—"}</td>
-                  <td className="p-3 text-neutral-300">{m.status}</td>
                   <td className="p-3 text-neutral-300">{m.isFeatured ? "Yes" : "No"}</td>
                   <td className="p-3">
                     <Link
