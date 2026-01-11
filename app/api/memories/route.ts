@@ -11,7 +11,6 @@ export async function POST(req: Request) {
     const isAnonymous = Boolean(body.isAnonymous);
     const authorName = isAnonymous ? null : (typeof body.authorName === "string" ? body.authorName.trim() : null);
     const relationship = typeof body.relationship === "string" ? body.relationship.trim() || null : null;
-
     const promptId = typeof body.promptId === "string" ? body.promptId : null;
 
     const placeName = typeof body.placeName === "string" ? body.placeName.trim() || null : null;
@@ -33,7 +32,9 @@ export async function POST(req: Request) {
         placeLng,
         isVisible: true,
         isFeatured: false,
-        media: cleanMedia.length ? { create: cleanMedia.map((url) => ({ mediaUrl: url })) } : undefined,
+        media: cleanMedia.length
+          ? { create: cleanMedia.map((url) => ({ mediaUrl: url })) }
+          : undefined,
       },
       select: { id: true },
     });

@@ -9,13 +9,16 @@ export async function GET() {
 
   const memories = await prisma.memory.findMany({
     where: { isVisible: true },
-    include: { media: true, prompt: true },
+    include: { media: true },
     orderBy: { createdAt: "desc" },
     take: 400,
   });
 
-  const byPrompt = prompts.map((p) => {
-    const answers = memories
+  const byPrompt = prompts.map((p) => ({
+    promptId: p.id,
+    promptTitle: p.title,
+    helperText: p.helperText,
+    answers: memories
       .filter((m) => m.promptId === p.id)
       .slice(0, 8)
       .map((m) => ({
@@ -26,15 +29,8 @@ export async function GET() {
         lat: m.placeLat,
         lng: m.placeLng,
         photo: m.media?.[0]?.mediaUrl ?? null,
-      }));
-
-    return {
-      promptId: p.id,
-      promptTitle: p.title,
-      helperText: p.helperText,
-      answers,
-    };
-  });
+      })),
+  }));
 
   const places = memories
     .filter((m) => m.placeLat !== null && m.placeLng !== null)
@@ -50,7 +46,7 @@ export async function GET() {
     }));
 
   const photos = memories
-    .filter((m) => m.media.length > 0)
+    .filter((m) => (m.media?.length ?? 0) > 0)
     .slice(0, 30)
     .map((m) => ({
       id: m.id,
@@ -59,10 +55,5 @@ export async function GET() {
       photo: m.media[0].mediaUrl,
     }));
 
-  return NextResponse.json({
-    ok: true,
-    byPrompt,
-    places,
-    photos,
-  });
+  return NextResponse.json({ ok: true, byPrompt, places, photos });
 }

@@ -6,7 +6,6 @@ export async function POST(req: Request) {
   if (!process.env.ADMIN_PASSCODE) {
     return NextResponse.json({ ok: false, error: "ADMIN_PASSCODE not set" }, { status: 500 });
   }
-
   if (typeof passcode !== "string" || passcode !== process.env.ADMIN_PASSCODE) {
     return NextResponse.json({ ok: false, error: "Invalid passcode" }, { status: 401 });
   }
