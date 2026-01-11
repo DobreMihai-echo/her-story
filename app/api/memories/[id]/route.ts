@@ -7,7 +7,9 @@ export async function PUT(
   req: NextRequest,
   context: { params: Promise<{ id: string }> }
 ) {
-  const admin = cookies().get("admin")?.value;
+  const cookieStore = await cookies();
+  const admin = cookieStore.get("admin")?.value;
+
   if (admin !== "1") {
     return NextResponse.json({ ok: false, error: "Unauthorized" }, { status: 401 });
   }
@@ -46,6 +48,9 @@ export async function PUT(
 
     return NextResponse.json({ ok: true });
   } catch {
-    return NextResponse.json({ ok: false, error: "Could not update memory" }, { status: 500 });
+    return NextResponse.json(
+      { ok: false, error: "Could not update memory" },
+      { status: 500 }
+    );
   }
 }
