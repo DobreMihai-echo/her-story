@@ -20,35 +20,14 @@ type PromptGroup = {
   answers: Answer[];
 };
 
-type PlaceItem = {
-  id: string;
-  placeName?: string | null;
-  lat?: number | null;
-  lng?: number | null;
-  message: string;
-  author: string;
-  photo?: string | null;
-};
-
-type PhotoItem = {
-  id: string;
-  message: string;
-  author: string;
-  photo: string;
-};
-
 type Payload = {
   byPrompt: PromptGroup[];
-  places: PlaceItem[];
-  photos: PhotoItem[];
 };
 
 type Slide =
   | { kind: "TITLE" }
   | { kind: "SECTION"; title: string; subtitle?: string }
   | { kind: "QUOTE"; answer: Answer }
-  | { kind: "PHOTO"; item: PhotoItem }
-  | { kind: "PLACE"; item: PlaceItem }
   | { kind: "END" };
 
 export default function RewindPage() {
@@ -70,6 +49,7 @@ export default function RewindPage() {
     const out: Slide[] = [];
     out.push({ kind: "TITLE" });
 
+    // For each prompt: section -> answers
     for (const grp of data.byPrompt) {
       if (!grp.answers?.length) continue;
 
@@ -79,23 +59,11 @@ export default function RewindPage() {
         subtitle: grp.helperText ?? "What people answered.",
       });
 
-      const answers = grp.answers.slice(0, 6);
-      for (const a of answers) out.push({ kind: "QUOTE", answer: a });
+      // show up to 6 answers per prompt (tune as you like)
+      for (const a of grp.answers.slice(0, 6)) {
+        out.push({ kind: "QUOTE", answer: a });
+      }
     }
-
-    out.push({
-      kind: "SECTION",
-      title: "Places visited",
-      subtitle: "Pins on the map. Moments in the heart.",
-    });
-    for (const p of data.places.slice(0, 10)) out.push({ kind: "PLACE", item: p });
-
-    out.push({
-      kind: "SECTION",
-      title: "Moments",
-      subtitle: "Snapshots, like receipts from a life.",
-    });
-    for (const p of data.photos.slice(0, 12)) out.push({ kind: "PHOTO", item: p });
 
     out.push({ kind: "END" });
     return out;
@@ -137,27 +105,19 @@ export default function RewindPage() {
             The rewind.
           </h1>
           <p className="mt-3 text-[color:var(--muted)] text-lg">
-            Questions. Answers. Places. Moments.
+            Four questions. A hundred little truths.
           </p>
         </div>
 
         <div className="flex flex-wrap gap-3">
-          <button className="btn-ghost" onClick={prev} disabled={idx === 0}>
-            Prev
-          </button>
-          <button className="btn-ghost" onClick={() => setPlaying((p) => !p)}>
-            {playing ? "Pause" : "Play"}
-          </button>
-          <button className="btn-pink" onClick={next} disabled={idx >= slides.length - 1}>
-            Next
-          </button>
-          <button className="btn-ghost" onClick={restart}>
-            Restart
-          </button>
+          <button className="btn-ghost" onClick={prev} disabled={idx === 0}>Prev</button>
+          <button className="btn-ghost" onClick={() => setPlaying((p) => !p)}>{playing ? "Pause" : "Play"}</button>
+          <button className="btn-pink" onClick={next} disabled={idx >= slides.length - 1}>Next</button>
+          <button className="btn-ghost" onClick={restart}>Restart</button>
         </div>
       </div>
 
-      {/* MAIN PLAYER (global SATC background) */}
+      {/* Main player background */}
       <div
         className="mt-8 card p-10 min-h-[460px] flex items-center justify-center"
         style={{
@@ -186,10 +146,6 @@ export default function RewindPage() {
               )}
 
               {slide.kind === "QUOTE" && <QuoteSlide answer={slide.answer} />}
-
-              {slide.kind === "PLACE" && <PlaceSlide item={slide.item} />}
-
-              {slide.kind === "PHOTO" && <PhotoSlide item={slide.item} />}
 
               {slide.kind === "END" && <EndSlide />}
             </motion.div>
@@ -220,11 +176,7 @@ function TitleSlide() {
     >
       <div
         className="badge"
-        style={{
-          background: "rgba(255,45,141,.22)",
-          borderColor: "rgba(255,255,255,.35)",
-          color: "#fff",
-        }}
+        style={{ background: "rgba(255,45,141,.22)", borderColor: "rgba(255,255,255,.35)", color: "#fff" }}
       >
         ISSUE 01
       </div>
@@ -232,7 +184,7 @@ function TitleSlide() {
         REWIND
       </div>
       <div className="mt-4 text-white/85 text-lg">
-        A montage of what people wrote, where you went, and what it all meant.
+        The questions people answered about her.
       </div>
     </div>
   );
@@ -253,13 +205,9 @@ function SectionSlide({ title, subtitle }: { title: string; subtitle?: string })
     >
       <div
         className="badge"
-        style={{
-          background: "rgba(255,45,141,.20)",
-          borderColor: "rgba(255,255,255,.35)",
-          color: "#fff",
-        }}
+        style={{ background: "rgba(255,45,141,.20)", borderColor: "rgba(255,255,255,.35)", color: "#fff" }}
       >
-        SECTION
+        QUESTION
       </div>
       <div className="mt-6 text-5xl leading-tight" style={{ fontFamily: "var(--font-heading)" }}>
         {title}
@@ -272,7 +220,6 @@ function SectionSlide({ title, subtitle }: { title: string; subtitle?: string })
 function QuoteSlide({ answer }: { answer: Answer }) {
   return (
     <div className="grid gap-6 md:grid-cols-2 items-center">
-      {/* LEFT: SATC texture background */}
       <div
         className="rounded-2xl border p-6"
         style={{
@@ -289,83 +236,17 @@ function QuoteSlide({ answer }: { answer: Answer }) {
         </div>
         <div className="mt-5 text-[color:var(--muted)]">— {answer.author}</div>
 
-        {(answer.placeName || (answer.lat && answer.lng)) && (
-          <div className="mt-4 text-sm text-[color:var(--muted)]">
-            {answer.placeName ?? "Pinned place"}
-          </div>
+        {answer.placeName && (
+          <div className="mt-4 text-sm text-[color:var(--muted)]">{answer.placeName}</div>
         )}
       </div>
 
-      {/* RIGHT: photo (or placeholder) */}
       <div className="rounded-2xl border overflow-hidden" style={{ borderColor: "var(--line)" }}>
         {answer.photo ? (
           <img src={answer.photo} alt="" className="w-full h-72 object-cover" />
         ) : (
           <div className="p-10 text-[color:var(--muted)]">No photo attached.</div>
         )}
-      </div>
-    </div>
-  );
-}
-
-function PlaceSlide({ item }: { item: PlaceItem }) {
-  return (
-    <div className="grid gap-6 md:grid-cols-2 items-center">
-      {/* LEFT: city texture */}
-      <div
-        className="rounded-2xl border p-6"
-        style={{
-          borderColor: "var(--line)",
-          backgroundImage:
-            "linear-gradient(180deg, rgba(255,255,255,.90), rgba(255,246,251,.92)), url(/satc/city.jpg)",
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-        }}
-      >
-        <div className="badge">PLACE</div>
-        <div className="mt-5 text-4xl leading-tight" style={{ fontFamily: "var(--font-heading)" }}>
-          {item.placeName ?? "Somewhere"}
-        </div>
-        <div className="mt-4 text-[color:var(--muted)] leading-relaxed">“{item.message}”</div>
-        <div className="mt-4 text-[color:var(--muted)]">— {item.author}</div>
-      </div>
-
-      {/* RIGHT: photo (or placeholder) */}
-      <div className="rounded-2xl border overflow-hidden" style={{ borderColor: "var(--line)" }}>
-        {item.photo ? (
-          <img src={item.photo} alt="" className="w-full h-72 object-cover" />
-        ) : (
-          <div className="p-10 text-[color:var(--muted)]">No photo for this place.</div>
-        )}
-      </div>
-    </div>
-  );
-}
-
-function PhotoSlide({ item }: { item: PhotoItem }) {
-  return (
-    <div className="grid gap-6 md:grid-cols-2 items-center">
-      {/* LEFT: memories texture */}
-      <div
-        className="rounded-2xl border p-6"
-        style={{
-          borderColor: "var(--line)",
-          backgroundImage:
-            "linear-gradient(180deg, rgba(255,255,255,.90), rgba(255,246,251,.92)), url(/satc/memories.jpg)",
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-        }}
-      >
-        <div className="badge">MOMENT</div>
-        <div className="mt-5 text-4xl leading-tight" style={{ fontFamily: "var(--font-heading)" }}>
-          “{item.message}”
-        </div>
-        <div className="mt-5 text-[color:var(--muted)]">— {item.author}</div>
-      </div>
-
-      {/* RIGHT: photo */}
-      <div className="rounded-2xl border overflow-hidden" style={{ borderColor: "var(--line)" }}>
-        <img src={item.photo} alt="" className="w-full h-72 object-cover" />
       </div>
     </div>
   );
@@ -386,11 +267,7 @@ function EndSlide() {
     >
       <div
         className="badge"
-        style={{
-          background: "rgba(255,45,141,.20)",
-          borderColor: "rgba(255,255,255,.35)",
-          color: "#fff",
-        }}
+        style={{ background: "rgba(255,45,141,.20)", borderColor: "rgba(255,255,255,.35)", color: "#fff" }}
       >
         THE END
       </div>

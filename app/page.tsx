@@ -27,7 +27,7 @@ export default async function Home() {
         </div>
 
         <div className="flex flex-wrap gap-3">
-          <Link className="btn-pink" href="/submit">Write a note</Link>
+          <Link className="btn-pink" href="/submit">Write a memory</Link>
           <Link className="btn-ghost" href="/city">The City</Link>
           <Link className="btn-ghost" href="/rewind">Rewind</Link>
           <Link className="btn-ghost" href="/letters">Letters</Link>

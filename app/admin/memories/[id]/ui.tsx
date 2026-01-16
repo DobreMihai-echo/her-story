@@ -37,6 +37,21 @@ export default function EditMemoryClient({ memory, prompts }: any) {
     setInfo(d.ok ? "Saved." : `Error: ${d.error}`);
   }
 
+  async function deleteForever() {
+  const ok = confirm("Delete this memory permanently? This cannot be undone.");
+  if (!ok) return;
+
+  const resp = await fetch(`/api/memories/${memory.id}/delete`, { method: "POST" });
+  const data = await resp.json();
+
+  if (!data.ok) {
+    setInfo(`Error: ${data.error || "Delete failed"}`);
+    return;
+  }
+
+  window.location.href = "/admin/studio";
+}
+
   return (
     <main className="mx-auto max-w-3xl px-6 py-10">
       <div className="badge">EDIT MEMORY</div>
@@ -112,6 +127,13 @@ export default function EditMemoryClient({ memory, prompts }: any) {
         </label>
 
         <button className="btn-pink" onClick={save}>Save</button>
+        <button
+  onClick={deleteForever}
+  className="btn-ghost"
+  style={{ borderColor: "rgba(255,0,0,.35)", color: "#b00020" }}
+>
+  Delete permanently
+</button>
         {info && <div className="text-sm text-[color:var(--muted)]">{info}</div>}
       </div>
     </main>

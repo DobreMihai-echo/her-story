@@ -7,20 +7,18 @@ export async function GET() {
     orderBy: [{ sortOrder: "asc" }, { title: "asc" }],
   });
 
+  // Pull a reasonable amount of recent visible memories
   const memories = await prisma.memory.findMany({
     where: { isVisible: true },
     include: { media: true },
     orderBy: { createdAt: "desc" },
-    take: 400,
+    take: 500,
   });
 
-  const byPrompt = prompts.map((p) => ({
-    promptId: p.id,
-    promptTitle: p.title,
-    helperText: p.helperText,
-    answers: memories
+  const byPrompt = prompts.map((p) => {
+    const answers = memories
       .filter((m) => m.promptId === p.id)
-      .slice(0, 8)
+      .slice(0, 10)
       .map((m) => ({
         id: m.id,
         message: m.message,
@@ -29,31 +27,15 @@ export async function GET() {
         lat: m.placeLat,
         lng: m.placeLng,
         photo: m.media?.[0]?.mediaUrl ?? null,
-      })),
-  }));
+      }));
 
-  const places = memories
-    .filter((m) => m.placeLat !== null && m.placeLng !== null)
-    .slice(0, 20)
-    .map((m) => ({
-      id: m.id,
-      placeName: m.placeName,
-      lat: m.placeLat,
-      lng: m.placeLng,
-      message: m.message,
-      author: m.isAnonymous ? "Anonymous" : (m.authorName ?? "Someone"),
-      photo: m.media?.[0]?.mediaUrl ?? null,
-    }));
+    return {
+      promptId: p.id,
+      promptTitle: p.title,
+      helperText: p.helperText,
+      answers,
+    };
+  });
 
-  const photos = memories
-    .filter((m) => (m.media?.length ?? 0) > 0)
-    .slice(0, 30)
-    .map((m) => ({
-      id: m.id,
-      message: m.message,
-      author: m.isAnonymous ? "Anonymous" : (m.authorName ?? "Someone"),
-      photo: m.media[0].mediaUrl,
-    }));
-
-  return NextResponse.json({ ok: true, byPrompt, places, photos });
+  return NextResponse.json({ ok: true, byPrompt });
 }
