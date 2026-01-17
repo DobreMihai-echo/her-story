@@ -48,6 +48,9 @@ export default async function Home() {
                 Write a note
               </Link>
             )}
+            <Link className="btn-ghost whitespace-nowrap" href="/rewind">
+              Memories
+            </Link>
             <Link className="btn-ghost whitespace-nowrap" href="/letters">
               Letters
             </Link>
@@ -56,9 +59,6 @@ export default async function Home() {
             </Link>
             <Link className="btn-ghost whitespace-nowrap" href="/city">
               The City
-            </Link>
-            <Link className="btn-ghost whitespace-nowrap" href="/rewind">
-              Memories
             </Link>
           </div>
         </div>
