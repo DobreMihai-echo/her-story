@@ -18,7 +18,7 @@ export default function CityMapClient() {
 
   useEffect(() => {
     (async () => {
-      const r = await fetch("/api/city");
+      const r = await fetch("/api/city", { cache: "no-store" });
       const d = await r.json();
       if (d.ok) setPins(d.memories);
     })();
@@ -29,32 +29,37 @@ export default function CityMapClient() {
     return [pins[0].lat, pins[0].lng];
   }, [pins]);
 
-  // Import Leaflet/react-leaflet only in the browser
   const [Leaflet, setLeaflet] = useState<any>(null);
 
   useEffect(() => {
     let mounted = true;
-    (async () => {
-const L = await import("leaflet");
-const RL = await import("react-leaflet");
 
-      // Fix marker icons (CDN)
-const markerIcon = L.icon({
-  iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
-  iconRetinaUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png",
-  shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
-  iconSize: [25, 41],
-  iconAnchor: [12, 41],
-});
+    (async () => {
+      const Lmod: any = await import("leaflet");
+      const RLmod: any = await import("react-leaflet");
+
+      const L = Lmod?.default ?? Lmod;
+      const RL = RLmod?.default ?? RLmod;
+
+      const markerIcon = L.icon({
+        iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
+        iconRetinaUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png",
+        shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
+        iconSize: [25, 41],
+        iconAnchor: [12, 41],
+      });
 
       if (mounted) setLeaflet({ L, RL, markerIcon });
     })();
-    return () => { mounted = false; };
+
+    return () => {
+      mounted = false;
+    };
   }, []);
 
   if (!Leaflet) {
     return (
-      <div className="card p-8">
+      <div className="mt-8 card p-8">
         <div className="badge">THE CITY</div>
         <div className="mt-4 text-[color:var(--muted)]">Loading map…</div>
       </div>
@@ -66,17 +71,28 @@ const markerIcon = L.icon({
 
   return (
     <div className="mt-8 grid gap-6 lg:grid-cols-12">
+      {/* Map */}
       <div className="lg:col-span-8 card overflow-hidden">
-        <div style={{ width: "100%", height: 560 }}>
-          <MapContainer center={center} zoom={pins.length ? 3 : 2} style={{ width: "100%", height: "100%" }}>
-            <TileLayer attribution='&copy; OpenStreetMap contributors' url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+        {/* Responsive heights */}
+        <div className="w-full h-[340px] md:h-[480px] lg:h-[560px]">
+          <MapContainer
+            center={center}
+            zoom={pins.length ? 3 : 2}
+            style={{ width: "100%", height: "100%" }}
+          >
+            <TileLayer
+              attribution="&copy; OpenStreetMap contributors"
+              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            />
 
             {pins.map((p) => (
               <Marker
                 key={p.id}
                 position={[p.lat, p.lng]}
                 icon={markerIcon}
-                eventHandlers={{ click: () => setSelected(p) }}
+                eventHandlers={{
+                  click: () => setSelected(p),
+                }}
               >
                 <Popup>
                   <div style={{ minWidth: 220 }}>
@@ -97,12 +113,13 @@ const markerIcon = L.icon({
         </div>
       </div>
 
-      <aside className="lg:col-span-4 card p-7">
+      {/* Details panel */}
+      <aside className="lg:col-span-4 card p-6 sm:p-7">
         <div className="badge">PIN DETAILS</div>
 
         {selected ? (
           <div className="mt-5 space-y-4">
-            <div className="text-2xl" style={{ fontFamily: "var(--font-heading)" }}>
+            <div className="text-xl sm:text-2xl" style={{ fontFamily: "var(--font-heading)" }}>
               {selected.placeName ?? "Somewhere unforgettable"}
             </div>
 
@@ -122,7 +139,9 @@ const markerIcon = L.icon({
             <div className="text-sm text-[color:var(--muted)]">— {selected.author}</div>
           </div>
         ) : (
-          <p className="mt-5 text-[color:var(--muted)]">Click a pin to open a memory.</p>
+          <p className="mt-5 text-[color:var(--muted)]">
+            Tap a pin to open a memory.
+          </p>
         )}
       </aside>
     </div>

@@ -1,5 +1,8 @@
 import { prisma } from "@/lib/prisma";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export default async function ColumnPage() {
   const entries = await prisma.columnEntry.findMany({
     where: { isPublished: true },
@@ -8,12 +11,11 @@ export default async function ColumnPage() {
   });
 
   return (
-    <main className="mx-auto max-w-5xl px-6 py-10">
-
-      {/* ===== SATC HERO HEADER ===== */}
+    <main className="mx-auto max-w-5xl px-4 sm:px-6 py-8 sm:py-10">
+      {/* HERO */}
       <section className="card overflow-hidden mb-10">
         <div
-          className="p-10 text-white"
+          className="p-8 sm:p-10 text-white"
           style={{
             backgroundImage:
               "linear-gradient(180deg, rgba(255,45,141,.18) 0%, rgba(20,10,18,.65) 75%), url(/satc/column.jpg)",
@@ -25,46 +27,44 @@ export default async function ColumnPage() {
             justifyContent: "flex-end",
           }}
         >
-          <div
-            className="badge"
-            style={{
-              background: "rgba(255,45,141,.25)",
-              borderColor: "rgba(255,255,255,.35)",
-              color: "#fff",
-            }}
-          >
-            THE COLUMN
-          </div>
+          <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-6">
+            <div>
+              <div className="badge" style={{ background: "rgba(255,45,141,.25)", borderColor: "rgba(255,255,255,.35)", color: "#fff" }}>
+                THE COLUMN
+              </div>
 
-          <h1
-            className="mt-4 text-5xl leading-tight"
-            style={{ fontFamily: "var(--font-heading)" }}
-          >
-            The column.
-          </h1>
+              <h1 className="mt-4 text-4xl sm:text-5xl leading-tight" style={{ fontFamily: "var(--font-heading)" }}>
+                The column.
+              </h1>
 
-          <p className="mt-3 text-white/80 text-lg max-w-xl">
-            Short essays that frame the story.
-          </p>
-        </div>
-      </section>
-      {/* ===== END HERO ===== */}
-
-      {/* ===== COLUMN ENTRIES ===== */}
-      <div className="space-y-8 max-w-3xl mx-auto">
-        {entries.map((e) => (
-          <article key={e.id} className="card p-7">
-            <div className="text-xs text-[color:var(--muted)]">
-              {e.createdAt.toISOString().slice(0, 10)}
+              <p className="mt-3 text-white/80 text-base sm:text-lg max-w-xl">
+                Short essays that frame the story.
+              </p>
             </div>
 
-            <h2
-              className="mt-3 text-3xl"
-              style={{ fontFamily: "var(--font-heading)" }}
-            >
+            {/* HEADSHOT ICON */}
+            <div className="shrink-0">
+              <div className="rounded-2xl overflow-hidden border" style={{ borderColor: "rgba(255,255,255,.35)" }}>
+                <img
+                  src="/her/head.jpg"
+                  alt="Her headshot"
+                  className="w-24 h-24 sm:w-28 sm:h-28 object-cover"
+                />
+              </div>
+              <div className="mt-2 text-xs text-white/80 text-center">Her</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ENTRIES */}
+      <div className="space-y-8 max-w-3xl mx-auto">
+        {entries.map((e) => (
+          <article key={e.id} className="card p-6 sm:p-7">
+            <div className="text-xs text-[color:var(--muted)]">{e.createdAt.toISOString().slice(0, 10)}</div>
+            <h2 className="mt-3 text-2xl sm:text-3xl" style={{ fontFamily: "var(--font-heading)" }}>
               {e.title}
             </h2>
-
             <p className="mt-4 whitespace-pre-line text-[color:var(--muted)] leading-relaxed">
               {e.body}
             </p>
